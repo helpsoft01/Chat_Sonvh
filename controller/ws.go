@@ -8,6 +8,7 @@ import (
 	"flag"
 	"html/template"
 	model "../model"
+	"encoding/json"
 )
 
 var upgrader websocket.Upgrader
@@ -15,7 +16,6 @@ var (
 	Addr = flag.String("addr", "127.0.0.1:9090", "http service address")
 	CmdPath string
 	homeTempl = template.Must(template.ParseFiles("../chat/view/Home.html"))
-	conn *websocket.Conn
 )
 
 const (
@@ -29,7 +29,7 @@ func wsInternalErrorPrint(ws *websocket.Conn, msg string, err error) {
 func checkSameOrigin(r *http.Request) bool {
 	return true
 }
-func processData(obj interface{}) {
+func processData(obj interface{}, conn websocket.Conn) {
 
 	var err error
 	var notification string
@@ -48,14 +48,34 @@ func processData(obj interface{}) {
 		wsInternalErrorPrint(conn, "read", err)
 		return
 	}
+	ReplyClient(notification, conn)
+}
+func ReplyClient(notification string, conn websocket.Conn) {
 
 	// reply to client
-	err = conn.WriteMessage(NoFrame, []byte( notification))
+
+	errType := &model.ErrorType{}
+
+	if len(notification) > 0 {
+		errType.SetError(true)
+		errType.SetNotification(notification)
+	} else {
+		errType.SetError(false)
+		errType.SetNotification("")
+	}
+
+	jsData, err := json.Marshal(errType)
+	if err != nil {
+		return
+	}
+
+	err = conn.WriteMessage(NoFrame, []byte( string(jsData)))
 	if err != nil {
 		wsInternalErrorPrint(conn, "write", err)
 		return
 	}
 }
+
 func ListenerIncomming(conn *websocket.Conn) {
 
 	defer conn.Close()
@@ -67,7 +87,7 @@ func ListenerIncomming(conn *websocket.Conn) {
 			obj, err := typeData.GetValue(data)
 
 			if err == nil {
-				processData(obj)
+				processData(obj, &conn)
 			}
 		}
 	}
@@ -81,6 +101,7 @@ func ServerWs(w http.ResponseWriter, r *http.Request) {
 	};
 
 	var err error
+	var conn *websocket.Conn
 	conn, err = upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		fmt.Println("upgrade:", err)

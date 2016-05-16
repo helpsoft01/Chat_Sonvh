@@ -92,7 +92,7 @@
                 }
                 client.conn.onmessage=function(evt){
 
-                    //var object = JSON.parse(e.data);
+                    var object = JSON.parse(e.data);
                     var receive_mg=evt.data;
                     appendLog('received...:'+receive_mg)
                 }

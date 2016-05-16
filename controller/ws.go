@@ -33,6 +33,7 @@ func processData(obj interface{}) {
 
 	var err error
 	var notification string
+
 	switch obj.(type) {
 	case *model.User:
 
@@ -40,18 +41,19 @@ func processData(obj interface{}) {
 		user.Println()
 		err = user.Add()
 		if err != nil {
-			notification = err
+			notification = err.Error()
 		}
 	}
-
 	if err != nil {
 		wsInternalErrorPrint(conn, "read", err)
+		return
 	}
 
 	// reply to client
-	err = conn.WriteMessage(NoFrame, notification)
+	err = conn.WriteMessage(NoFrame, []byte( notification))
 	if err != nil {
 		wsInternalErrorPrint(conn, "write", err)
+		return
 	}
 }
 func ListenerIncomming(conn *websocket.Conn) {
@@ -85,5 +87,5 @@ func ServerWs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	go ListenerIncomming(conn)
+	ListenerIncomming(conn)
 }

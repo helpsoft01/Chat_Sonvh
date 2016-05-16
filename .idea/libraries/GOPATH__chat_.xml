@@ -1,0 +1,17 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;chat&gt;">
+    <CLASSES>
+      <root url="file://$USER_HOME$/tools/go1.6/gopath/src/websocket" />
+      <root url="file://$USER_HOME$/tools/go1.6/gopath/src/github.com" />
+      <root url="file://$USER_HOME$/tools/go1.6/gopath/src/goredis-master" />
+      <root url="file://$USER_HOME$/tools/go1.6/gopath/src/golang.org" />
+      <root url="file://$USER_HOME$/tools/go1.6/gopath/src/Chat" />
+      <root url="file://$USER_HOME$/tools/go1.6/gopath/src/redis" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <excluded>
+      <root url="file://$PROJECT_DIR$" />
+    </excluded>
+  </library>
+</component>

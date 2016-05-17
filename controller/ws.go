@@ -18,10 +18,6 @@ var (
 	homeTempl = template.Must(template.ParseFiles("../chat/view/Home.html"))
 )
 
-const (
-	NoFrame = -1
-)
-
 func wsInternalErrorPrint(ws websocket.Conn, msg string, err error) {
 	//ws.WriteMessage(websocket.TextMessage, []byte("Internal server we error"))
 	log.Println("ws:" + msg, err)
@@ -33,6 +29,7 @@ func processData(obj interface{}, conn websocket.Conn) {
 
 	var err error
 	var notification string
+	var jsType model.JsonType
 
 	switch obj.(type) {
 	case *model.User:
@@ -42,29 +39,23 @@ func processData(obj interface{}, conn websocket.Conn) {
 		err = user.Add()
 		if err != nil {
 			notification = err.Error()
+			jsType.SetNotification(notification)
+		} else {
+			jsType.SetNotification("")
 		}
+		jsType.SetType(model.TYPEMESSAGE_CREATE_ACCOUNT)
 	}
 	if err != nil {
 		wsInternalErrorPrint(conn, "read", err)
 		return
 	}
-	ReplyClient(notification, conn)
+	ReplyClient(jsType, conn)
 }
-func ReplyClient(notification string, conn websocket.Conn) {
+func ReplyClient(jsType model.JsonType, conn websocket.Conn) {
 
 	// reply to client
 
-	errType := &model.ErrorType{}
-
-	if len(notification) > 0 {
-		errType.SetError(true)
-		errType.SetNotification(notification)
-	} else {
-		errType.SetError(false)
-		errType.SetNotification("")
-	}
-
-	data, err := json.Marshal(errType)
+	data, err := json.Marshal(&jsType)
 	if err != nil {
 		return
 	}

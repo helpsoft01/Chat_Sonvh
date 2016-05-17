@@ -9,6 +9,8 @@ import (
 	"html/template"
 	model "../model"
 	"encoding/json"
+	"io"
+	"io/ioutil"
 )
 
 var upgrader websocket.Upgrader
@@ -83,7 +85,16 @@ func ReplyClient(jsType model.JsonType, conn websocket.Conn) {
 		return
 	}
 }
+func ReadMessage(c *websocket.Conn) (messageType int, p []byte, err error) {
 
+	var r io.Reader
+	messageType, r, err = c.NextReader()
+	if err != nil {
+		return messageType, nil, err
+	}
+	p, err = ioutil.ReadAll(r)
+	return messageType, p, err
+}
 func ListenerIncomming(conn *websocket.Conn) {
 
 	defer conn.Close()
@@ -91,7 +102,8 @@ func ListenerIncomming(conn *websocket.Conn) {
 		if r := recover(); r != nil {
 			fmt.Println("Recoverd readMessage", r)
 		}
-		_, data, err := conn.ReadMessage()
+
+		_, data, err := ReadMessage(conn)
 
 		if err == nil {
 			var objData = model.TypeData{}
@@ -104,7 +116,7 @@ func ListenerIncomming(conn *websocket.Conn) {
 			fmt.Println("ws close:", err)
 			if c, k := err.(*websocket.CloseError); k {
 				if c.Code == websocket.CloseGoingAway {
-					fmt.Println("ws close:", err)
+					//fmt.Println("ws close:", err)
 				}
 			}
 		}

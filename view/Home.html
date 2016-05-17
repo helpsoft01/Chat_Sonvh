@@ -36,7 +36,11 @@
 
             // listener event
             send.on('click',function(){
-                sendMessage(msg)
+                var infor=InforAccount;
+                infor.Name= $('#txtAccount').val();
+                infor.Password=$('#txtPass').val();
+
+                sendMessage(infor.getAccount())
             })
             btCreateAccount.on('click',function(){
                 var infor=InforAccount;
@@ -111,9 +115,10 @@
                             break;
                         case 1:
                             if (receive_mg.Notification==""){
-
+                                divInfor.hide()
+                                divChat.show()
+                                msg.focus()
                             }
-                            alert(receive_mg.Notification)
                             break;
                         case 2:
                             break;
@@ -127,6 +132,8 @@
                 alert("Websocket isn't supported by your browser")
             }
         }
+
+
 
     </script>
     <style type="text/css">
@@ -156,6 +163,8 @@
         input[type="button"]{
             font-size:16px
         }
+
+
 
 
 

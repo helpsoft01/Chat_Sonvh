@@ -24,9 +24,7 @@ func wsInternalErrorPrint(msg string, err error) {
 	//ws.WriteMessage(websocket.TextMessage, []byte("Internal server we error"))
 	log.Println("ws:" + msg, err)
 }
-func checkOrigin(r *http.Request) bool {
-	return true
-}
+
 func processData(typeMsg model.TypeMessage, obj interface{}, conn websocket.Conn) {
 
 	var err error
@@ -85,16 +83,6 @@ func ReplyClient(jsType model.JsonType, conn websocket.Conn) {
 		return
 	}
 }
-func ReadMessage(c *websocket.Conn) (messageType int, p []byte, err error) {
-
-	var r io.Reader
-	messageType, r, err = c.NextReader()
-	if err != nil {
-		return messageType, nil, err
-	}
-	p, err = ioutil.ReadAll(r)
-	return messageType, p, err
-}
 func ListenerIncomming(conn *websocket.Conn) {
 
 	defer conn.Close()
@@ -103,7 +91,7 @@ func ListenerIncomming(conn *websocket.Conn) {
 			fmt.Println("Recoverd readMessage", r)
 		}
 
-		_, data, err := ReadMessage(conn)
+		_, data, err := conn.ReadMessage()
 
 		if err == nil {
 			var objData = model.TypeData{}
@@ -130,7 +118,6 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 	upgrader = websocket.Upgrader{
 		ReadBufferSize: 2 * 1024,
 		WriteBufferSize:2 * 1024,
-		CheckOrigin:checkOrigin,
 	};
 
 	var err error

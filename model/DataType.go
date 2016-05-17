@@ -34,7 +34,13 @@ func (d *TypeData) GetData() json.RawMessage {
 
 func (d *TypeData) GetValue(b []byte) (interface{}, error) {
 
-	err := json.Unmarshal(b, &d)
+	b[0] = ' '
+	b[len(b) - 1] = ' '
+	val := string(b)
+	r := strings.NewReplacer("\\", "")
+	val = r.Replace(val)
+
+	err := json.Unmarshal([]byte(val), &d)
 	if err != nil {
 		return nil, err
 	}

@@ -134,6 +134,13 @@
                             appendNotification(receive_mg.Notification)
                             break;
                         case 2:
+                            if (receive_mg.Notification==""){
+                                divInfor.hide()
+                                divChat.show()
+                                msg.focus()
+                            }else{
+
+                            }
                             break;
                         case 3:
                             appendLog('received...:'+receive_mg.Notification)

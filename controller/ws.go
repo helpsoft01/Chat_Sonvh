@@ -74,6 +74,11 @@ func ListenerIncomming(conn *websocket.Conn) {
 
 	defer conn.Close()
 	for {
+
+		if r := recover(); r != nil {
+			fmt.Println("Recoverd readMessage", r)
+		}
+
 		_, data, err := conn.ReadMessage()
 		if err == nil {
 
@@ -81,7 +86,6 @@ func ListenerIncomming(conn *websocket.Conn) {
 			obj, err := typeData.GetValue(data)
 
 			if err == nil {
-
 				processData(obj, *conn)
 			}
 		}

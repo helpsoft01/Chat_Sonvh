@@ -35,21 +35,30 @@
             CreateConnect(client)
 
             // listener event
-            send.on('click',function(){
+            btLogin.on('click',function(){
                 var infor=InforAccount;
                 infor.Name= $('#txtAccount').val();
                 infor.Password=$('#txtPass').val();
 
                 sendMessage(infor.getAccount())
+
             })
             btCreateAccount.on('click',function(){
                 var infor=InforAccount;
                 infor.Name= $('#txtAccount').val();
                 infor.Password=$('#txtPass').val();
-
+                infor.TypeMsg=2
                 sendMessage(infor.getAccount())
 
             })
+            send.on('click',function(){
+                var infor=InforAccount;
+                infor.Name= $('#txtAccount').val();
+                infor.Password=$('#txtPass').val();
+                infor.TypeMsg=1
+                sendMessage(infor.getAccount())
+            })
+
             msg.on('keypress',function(evt){
                 if (evt.which == 13){
                     sendMessage(msg)
@@ -63,10 +72,11 @@
             Name:"",
             Email:"",
             Password:"",
+            TypeMsg:1
 
             getAccount:function (){
 
-                type='{"TypeMsg":1,'
+                type='{"TypeMsg":'+ this.TypeMsg +','
                 data=' "Data":{"Id":'+ this.Id +', "Name":"'+this.Name+'","Email":"'+this.Email+'","Password":"'+this.Password+'"}}'
 
                 return JSON.stringify(type+data)
@@ -75,13 +85,13 @@
 
         function sendMessage(msg){
 
-            appendLog('sending...:'+ msg)
+            //appendLog('sending...:'+ msg)
             client.conn.send(msg)
         }
         function appendNotification(msg) {
             divNotification.empty()
-            divMsg=$("<div><b>"+msg+"</b></div>")
-            divMsg.appendTo(divNotification)
+            divMsg=$("<div>Notification:<b>"+msg+"</b></div>")
+            divNotification.append(divMsg)
         }
         function appendLog(msg) {
                 divMsg=$("<div><b>"+msg+"</b></div>")
@@ -98,7 +108,7 @@
                 appendLog('Websocket is supported bu your browser:')
                 client.conn=new WebSocket("ws://127.0.0.1:9090/ws");
                 client.conn.onopen=function(){
-                    appendLog('sending...:Make to connect')
+                    appendLog('->1. Make to connect')
                     //sendMessage("Connect the first.")
                 }
                 client.conn.onclose=function(evt){
@@ -111,14 +121,17 @@
 
                     switch (receive_mg.TypeMsg ){
                         case 0:
-                            appendNotification(receive_mg.Notification)
+
                             break;
                         case 1:
                             if (receive_mg.Notification==""){
                                 divInfor.hide()
                                 divChat.show()
                                 msg.focus()
+                            }else{
+
                             }
+                            appendNotification(receive_mg.Notification)
                             break;
                         case 2:
                             break;
@@ -132,6 +145,8 @@
                 alert("Websocket isn't supported by your browser")
             }
         }
+
+
 
 
 
@@ -151,6 +166,11 @@
         .containchat{
 
         }
+        .idNotification{
+            width: 100%;
+            background:red;
+            padding-bottom:3px;
+        }
         #log{
             overflow:hidden;
             background-color:white
@@ -164,19 +184,11 @@
         input[type="button"]{
             font-size:16px
         }
-
-
-
-
-
-
-
-
-
     </style>
 </head>
 <body>
-
+<div class="idNotification"></div>
+</body>
 <div class="containInfor">
     <div>
         <div>
@@ -199,6 +211,6 @@
     </div>
     <div id="log"></div>
 </div>
-<div id="idNotification"></div>
-</body>
+
 </html>
+

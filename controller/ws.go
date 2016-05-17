@@ -18,14 +18,14 @@ var (
 	homeTempl = template.Must(template.ParseFiles("../chat/view/Home.html"))
 )
 
-func wsInternalErrorPrint(ws websocket.Conn, msg string, err error) {
+func wsInternalErrorPrint(msg string, err error) {
 	//ws.WriteMessage(websocket.TextMessage, []byte("Internal server we error"))
 	log.Println("ws:" + msg, err)
 }
 func checkOrigin(r *http.Request) bool {
 	return true
 }
-func processData(obj interface{}, conn websocket.Conn) {
+func processData(typeMsg model.TypeMessage, obj interface{}, conn websocket.Conn) {
 
 	var err error
 	var notification string
@@ -37,18 +37,26 @@ func processData(obj interface{}, conn websocket.Conn) {
 		user := obj.(*model.User)
 		user.Println()
 		err = user.Add()
-		if err != nil {
-			notification = err.Error()
-			jsType.SetNotification(notification)
-		} else {
-			jsType.SetNotification("")
+
+		switch typeMsg {
+		case model.TYPEMESSAGE_CREATE_ACCOUNT:
+			if err != nil {
+				notification = err.Error()
+				jsType.SetNotification(notification)
+			} else {
+				jsType.SetNotification("")
+			}
+			jsType.SetType(typeMsg)
+		case model.TYPEMESSAGE_LOGIN:
+			if err != nil {
+				notification = err.Error()
+				jsType.SetNotification(notification)
+			} else {
+				jsType.SetNotification("")
+			}
 		}
-		jsType.SetType(model.TYPEMESSAGE_CREATE_ACCOUNT)
 	}
-	if err != nil {
-		wsInternalErrorPrint(conn, "read", err)
-		return
-	}
+
 	ReplyClient(jsType, conn)
 }
 func ReplyClient(jsType model.JsonType, conn websocket.Conn) {
@@ -65,7 +73,7 @@ func ReplyClient(jsType model.JsonType, conn websocket.Conn) {
 
 	err = conn.WriteMessage(websocket.TextMessage, []byte(jsData))
 	if err != nil {
-		wsInternalErrorPrint(conn, "write", err)
+		wsInternalErrorPrint("write", err)
 		return
 	}
 }
@@ -73,20 +81,20 @@ func ReplyClient(jsType model.JsonType, conn websocket.Conn) {
 func ListenerIncomming(conn *websocket.Conn) {
 
 	defer conn.Close()
-	for {
+	if r := recover(); r != nil {
+		fmt.Println("Recoverd readMessage", r)
+	}
 
-		if r := recover(); r != nil {
-			fmt.Println("Recoverd readMessage", r)
-		}
+	for {
 
 		_, data, err := conn.ReadMessage()
 		if err == nil {
 
-			var typeData = model.TypeData{}
-			obj, err := typeData.GetValue(data)
+			var objData = model.TypeData{}
+			obj, err := objData.GetValue(data)
 
 			if err == nil {
-				processData(obj, *conn)
+				processData(objData.GetType(), obj, *conn)
 			}
 		}
 	}

@@ -4,6 +4,7 @@ import ()
 import (
 	"fmt"
 	"log"
+	"errors"
 )
 
 const (
@@ -51,22 +52,29 @@ func (u *User) OpenConnect() {
 func (u *User) Println() {
 	log.Println("uesr:", u.GetName(), "- pass:", u.GetPassWord())
 }
+func (u *User) CheckExistByName(name string) bool {
 
+	var result map[string]string
+	result, _ = u.GetClient().HGetAll(name)
+	if len(result) > 0 {
+		return true
+	} else {
+		return false
+	}
+}
 func (u *User) Add() error {
 
 	u.OpenConnect()
 
 	var err error
-	var result map[string]string
 
 	var key = DB_TABLE + ":" + u.GetName()
-	result, err = u.GetClient().HGetAll(key)
 
-	if err != nil {
-		return err
-	}
 	// add new record
-	if len(result) == 0 {
+	if u.CheckExistByName(u.GetName()) {
+
+		err = errors.New("Existed User")
+	} else {
 
 		var iResult int64
 		// 1. add primary key
@@ -81,11 +89,11 @@ func (u *User) Add() error {
 			pairs[DB_CL_Email] = u.GetEmail()
 			_ = u.GetClient().HMSet(key, pairs)
 		}
-	} else {
 	}
 
 	return err
 }
+
 func (u User) GetList() Users {
 	var lstUser Users
 	return lstUser

@@ -34,29 +34,35 @@ func processData(typeMsg model.TypeMessage, obj interface{}, conn websocket.Conn
 	switch obj.(type) {
 	case *model.User:
 
-		user := obj.(*model.User)
-		user.Println()
-		err = user.Add()
-
 		switch typeMsg {
 		case model.TYPEMESSAGE_CREATE_ACCOUNT:
+
+			user := obj.(*model.User)
+			user.Println()
+			err = user.Add()
+
 			if err != nil {
 				notification = err.Error()
 				jsType.SetNotification(notification)
 			} else {
 				jsType.SetNotification("")
 			}
-			jsType.SetType(typeMsg)
+
 		case model.TYPEMESSAGE_LOGIN:
-			if err != nil {
-				notification = err.Error()
-				jsType.SetNotification(notification)
-			} else {
+
+			user := obj.(*model.User)
+			user.Println()
+			if user.CheckExistByName(user.GetKey()) {
+
 				jsType.SetNotification("")
+			} else {
+
+				jsType.SetNotification("Not Exist User")
 			}
 		}
 	}
 
+	jsType.SetType(typeMsg)
 	ReplyClient(jsType, conn)
 }
 func ReplyClient(jsType model.JsonType, conn websocket.Conn) {

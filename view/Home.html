@@ -39,7 +39,7 @@
                 var infor=InforAccount;
                 infor.Name= $('#txtAccount').val();
                 infor.Password=$('#txtPass').val();
-
+                infor.TypeMsg=2
                 sendMessage(infor.getAccount())
 
             })
@@ -47,7 +47,7 @@
                 var infor=InforAccount;
                 infor.Name= $('#txtAccount').val();
                 infor.Password=$('#txtPass').val();
-                infor.TypeMsg=2
+                infor.TypeMsg=1
                 sendMessage(infor.getAccount())
 
             })
@@ -55,7 +55,7 @@
                 var infor=InforAccount;
                 infor.Name= $('#txtAccount').val();
                 infor.Password=$('#txtPass').val();
-                infor.TypeMsg=1
+                infor.TypeMsg=3
                 sendMessage(infor.getAccount())
             })
 
@@ -72,7 +72,7 @@
             Name:"",
             Email:"",
             Password:"",
-            TypeMsg:1
+            TypeMsg:0,
 
             getAccount:function (){
 

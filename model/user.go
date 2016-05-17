@@ -52,26 +52,30 @@ func (u *User) OpenConnect() {
 func (u *User) Println() {
 	log.Println("uesr:", u.GetName(), "- pass:", u.GetPassWord())
 }
-func (u *User) CheckExistByName(name string) bool {
+func (u *User) CheckExistByName(key string) bool {
 
 	var result map[string]string
-	result, _ = u.GetClient().HGetAll(name)
+	result, _ = u.GetClient().HGetAll(key)
+
 	if len(result) > 0 {
 		return true
 	} else {
 		return false
 	}
 }
+func (u *User)GetKey() string {
+	var key = DB_TABLE + ":" + u.GetName()
+	return key
+}
 func (u *User) Add() error {
 
 	u.OpenConnect()
 
 	var err error
-
-	var key = DB_TABLE + ":" + u.GetName()
+	var key = u.GetKey()
 
 	// add new record
-	if u.CheckExistByName(u.GetName()) {
+	if u.CheckExistByName(key) {
 
 		err = errors.New("Existed User")
 	} else {
@@ -79,10 +83,11 @@ func (u *User) Add() error {
 		var iResult int64
 		// 1. add primary key
 		iResult, _ = u.GetClient().SAdd(DB_IDS, u.GetName())
+
+		// 2. add detail record
 		if iResult == 0 {
 			fmt.Println("exist:", u.GetName())
 		} else {
-			// 2. add detail record
 			pairs := make(map[string]string)
 			pairs[DB_CL_Name] = u.GetName()
 			pairs[DB_CL_Password] = u.GetPassWord()

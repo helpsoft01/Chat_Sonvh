@@ -14,6 +14,7 @@
         var divInfor
         var btCreateAccount
         var btLogin
+        var divNotification
         $(document).ready(function () {
             // declare variables global
             send=$('#send');
@@ -24,6 +25,7 @@
 
             divChat=$('.containChat')
             divInfor=$('.containInfor')
+            divNotification=$('.idNotification')
 
             // default focus
             msg.focus()
@@ -72,6 +74,11 @@
             appendLog('sending...:'+ msg)
             client.conn.send(msg)
         }
+        function appendNotification(msg) {
+            divNotification.empty()
+            divMsg=$("<div><b>"+msg+"</b></div>")
+            divMsg.appendTo(divNotification)
+        }
         function appendLog(msg) {
                 divMsg=$("<div><b>"+msg+"</b></div>")
                 var d = log[0]
@@ -90,23 +97,34 @@
                     appendLog('sending...:Make to connect')
                     //sendMessage("Connect the first.")
                 }
-                client.conn.onmessage=function(evt){
-
-                    var object = JSON.parse(e.data);
-                    var receive_mg=evt.data;
-                    appendLog('received...:'+receive_mg)
-                }
                 client.conn.onclose=function(evt){
                     appendLog('closed...:'+evt.data)
+                }
+
+                client.conn.onmessage=function(evt){
+
+                    var receive_mg=JSON.parse(evt.data);
+
+                    switch (receive_mg.TypeMsg ){
+                        case 0:
+                            appendNotification(receive_mg.Notification)
+                            break;
+                        case 1:
+                            if (receive_mg.Notification==""){
+                            }
+                            break;
+                        case 2:
+                            break;
+                        case 3:
+                            appendLog('received...:'+receive_mg.Notification)
+                            break;
+                    }
                 }
 
             }else{
                 alert("Websocket isn't supported by your browser")
             }
         }
-
-
-
 
     </script>
     <style type="text/css">
@@ -136,6 +154,10 @@
         input[type="button"]{
             font-size:16px
         }
+
+
+
+
 
 
 

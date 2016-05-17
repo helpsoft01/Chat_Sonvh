@@ -22,11 +22,11 @@ const (
 	NoFrame = -1
 )
 
-func wsInternalErrorPrint(ws *websocket.Conn, msg string, err error) {
-	ws.WriteMessage(websocket.TextMessage, []byte("Internal server we error"))
+func wsInternalErrorPrint(ws websocket.Conn, msg string, err error) {
+	//ws.WriteMessage(websocket.TextMessage, []byte("Internal server we error"))
 	log.Println("ws:" + msg, err)
 }
-func checkSameOrigin(r *http.Request) bool {
+func checkOrigin(r *http.Request) bool {
 	return true
 }
 func processData(obj interface{}, conn websocket.Conn) {
@@ -64,12 +64,15 @@ func ReplyClient(notification string, conn websocket.Conn) {
 		errType.SetNotification("")
 	}
 
-	jsData, err := json.Marshal(errType)
+	data, err := json.Marshal(errType)
 	if err != nil {
 		return
 	}
 
-	err = conn.WriteMessage(NoFrame, []byte( string(jsData)))
+	jsData := string(data)
+	fmt.Println(jsData)
+
+	err = conn.WriteMessage(websocket.TextMessage, []byte(jsData))
 	if err != nil {
 		wsInternalErrorPrint(conn, "write", err)
 		return
@@ -87,7 +90,8 @@ func ListenerIncomming(conn *websocket.Conn) {
 			obj, err := typeData.GetValue(data)
 
 			if err == nil {
-				processData(obj, &conn)
+
+				processData(obj, *conn)
 			}
 		}
 	}
@@ -97,7 +101,7 @@ func ServerWs(w http.ResponseWriter, r *http.Request) {
 	upgrader = websocket.Upgrader{
 		ReadBufferSize: 1024,
 		WriteBufferSize:1024,
-		CheckOrigin:checkSameOrigin,
+		CheckOrigin:checkOrigin,
 	};
 
 	var err error

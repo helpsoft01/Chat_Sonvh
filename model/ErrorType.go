@@ -1,19 +1,22 @@
 package model
 
-type ErrorType struct {
-	IsError      bool
+type JsonType struct {
+	TypeMsg      TypeMessage
 	Notification string
 }
 
-func (e *ErrorType) GetError() bool {
-	return e.IsError
+func (d *JsonType) GetType() TypeMessage {
+
+	return d.TypeMsg
 }
-func (e *ErrorType) SetError(isErr bool) {
-	e.IsError = isErr
+
+func (d *JsonType) SetType(typeMsg TypeMessage) {
+	d.TypeMsg = typeMsg
 }
-func (e *ErrorType) GetNotification() string {
+
+func (e *JsonType) GetNotification() string {
 	return e.Notification
 }
-func (e *ErrorType) SetNotification(notification string) {
+func (e *JsonType) SetNotification(notification string) {
 	e.Notification = notification
 }

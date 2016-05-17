@@ -8,6 +8,7 @@ import (
 type TypeMessage int
 
 const (
+	TYPEMESSAGE_CREATE_ERROR TypeMessage = 0
 	TYPEMESSAGE_CREATE_ACCOUNT TypeMessage = 1
 	TYPEMESSAGE_LOGIN TypeMessage = 2
 	TYPEMESSAGE_CHAT TypeMessage = 3
@@ -22,12 +23,13 @@ func (d *TypeData) GetType() TypeMessage {
 
 	return d.TypeMsg
 }
-func (d *TypeData) GetData() json.RawMessage {
-	return d.Data
-}
 
 func (d *TypeData) SetType(typeMsg TypeMessage) {
 	d.TypeMsg = typeMsg
+}
+
+func (d *TypeData) GetData() json.RawMessage {
+	return d.Data
 }
 
 func (d *TypeData) GetValue(b []byte) (interface{}, error) {

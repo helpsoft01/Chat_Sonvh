@@ -23,7 +23,6 @@ type User struct {
 	Password string
 	Client
 }
-type Users map[string]User
 
 func (u *User) GetId() uint64 {
 	return u.Id
@@ -99,12 +98,3 @@ func (u *User) Add() error {
 	return err
 }
 
-func (u User) GetList() Users {
-	var lstUser Users
-	return lstUser
-}
-func (u User) Print(lst Users) {
-	for _, val := range lst {
-		fmt.Println("name:", val.GetName(), "pass: ", val.GetPassWord())
-	}
-}

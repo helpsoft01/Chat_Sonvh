@@ -52,7 +52,7 @@ func processData(typeMsg model.TypeMessage, obj interface{}, conn websocket.Conn
 
 			user := obj.(*model.User)
 			user.Println()
-			if user.CheckExistByName(user.GetKey()) {
+			if user.CheckExistByName() {
 
 				jsType.SetNotification("")
 			} else {
@@ -87,29 +87,37 @@ func ReplyClient(jsType model.JsonType, conn websocket.Conn) {
 func ListenerIncomming(conn *websocket.Conn) {
 
 	defer conn.Close()
-	if r := recover(); r != nil {
-		fmt.Println("Recoverd readMessage", r)
-	}
-
 	for {
-
+		if r := recover(); r != nil {
+			fmt.Println("Recoverd readMessage", r)
+		}
 		_, data, err := conn.ReadMessage()
-		if err == nil {
 
+		if err == nil {
 			var objData = model.TypeData{}
 			obj, err := objData.GetValue(data)
 
 			if err == nil {
 				processData(objData.GetType(), obj, *conn)
 			}
+		} else {
+			fmt.Println("ws close:", err)
+			if c, k := err.(*websocket.CloseError); k {
+				if c.Code == websocket.CloseGoingAway {
+					fmt.Println("ws close:", err)
+				}
+			}
 		}
+
+		conn.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(1000, "woops"))
+
 	}
 }
-func ServerWs(w http.ResponseWriter, r *http.Request) {
+func WsHandler(w http.ResponseWriter, r *http.Request) {
 
 	upgrader = websocket.Upgrader{
-		ReadBufferSize: 1024,
-		WriteBufferSize:1024,
+		ReadBufferSize: 2 * 1024,
+		WriteBufferSize:2 * 1024,
 		CheckOrigin:checkOrigin,
 	};
 
@@ -121,5 +129,5 @@ func ServerWs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ListenerIncomming(conn)
+	go ListenerIncomming(conn)
 }

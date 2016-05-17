@@ -51,8 +51,9 @@ func (u *User) OpenConnect() {
 func (u *User) Println() {
 	log.Println("uesr:", u.GetName(), "- pass:", u.GetPassWord())
 }
-func (u *User) CheckExistByName(key string) bool {
+func (u *User) CheckExistByName() bool {
 
+	var key = u.GetKey()
 	var result map[string]string
 	result, _ = u.GetClient().HGetAll(key)
 
@@ -74,7 +75,7 @@ func (u *User) Add() error {
 	var key = u.GetKey()
 
 	// add new record
-	if u.CheckExistByName(key) {
+	if u.CheckExistByName() {
 
 		err = errors.New("Existed User")
 	} else {

@@ -11,7 +11,7 @@ func main() {
 
 	flag.Parse()
 	log.SetFlags(0)
-	http.HandleFunc("/ws", ws.ServerWs)
+	http.HandleFunc("/ws", ws.WsHandler)
 	//http.HandleFunc("/", ws.ServerHome)
 	log.Fatal(http.ListenAndServe(*ws.Addr, nil))
 

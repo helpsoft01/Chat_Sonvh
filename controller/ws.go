@@ -9,8 +9,6 @@ import (
 	"html/template"
 	model "../model"
 	"encoding/json"
-	"io"
-	"io/ioutil"
 )
 
 var upgrader websocket.Upgrader
@@ -24,7 +22,9 @@ func wsInternalErrorPrint(msg string, err error) {
 	//ws.WriteMessage(websocket.TextMessage, []byte("Internal server we error"))
 	log.Println("ws:" + msg, err)
 }
-
+func checkOrigin(r *http.Request) bool {
+	return true
+}
 func processData(typeMsg model.TypeMessage, obj interface{}, conn websocket.Conn) {
 
 	var err error
@@ -118,6 +118,7 @@ func WsHandler(w http.ResponseWriter, r *http.Request) {
 	upgrader = websocket.Upgrader{
 		ReadBufferSize: 2 * 1024,
 		WriteBufferSize:2 * 1024,
+		CheckOrigin:checkOrigin,
 	};
 
 	var err error

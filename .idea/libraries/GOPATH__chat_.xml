@@ -3,6 +3,7 @@
     <CLASSES>
       <root url="file://$USER_HOME$/tools/go1.6/gopath/src/Chat" />
       <root url="file://$USER_HOME$/tools/go1.6/gopath/src/websocket" />
+      <root url="file://$USER_HOME$/tools/go1.6/gopath/src/flatbuffers" />
       <root url="file://$USER_HOME$/tools/go1.6/gopath/src/github.com" />
       <root url="file://$USER_HOME$/tools/go1.6/gopath/src/goredis-master" />
       <root url="file://$USER_HOME$/tools/go1.6/gopath/src/golang.org" />
